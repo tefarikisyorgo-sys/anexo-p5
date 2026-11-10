@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anexo P5 · Fuga en el customer journey</title>
+<meta name="description" content="Anexo interactivo de la Pregunta 5: dónde se concentra la fuga y cómo cambia entre compradores y no compradores (Falabella, julio 2026).">
+<link rel="stylesheet" href="./style.css?v=2026111001">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#resumen">Anexo P5 <span>Fuga · julio 2026</span></a>
+    <nav class="menu" aria-label="Secciones">
+      <a href="#resumen">Resumen</a>
+      <a href="#medidas">Cómo medimos</a>
+      <a href="#estados">Fuga por estado</a>
+      <a href="#brecha">Compradores vs no</a>
+      <a href="#sensibilidades">Sensibilidades</a>
+      <a href="#producto">Quién se va de Producto</a>
+      <a href="#carro">Camino a comprar</a>
+      <a href="#checkout">Checkout por pasos</a>
+      <a href="#validaciones">Validaciones</a>
+      <a href="#glosario">Glosario</a>
+      <a href="#descargas">Descargas</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="estado-carga" class="aviso">Cargando datos…</div>
+
+  <section id="resumen">
+    <h1>¿Dónde se concentra la fuga y cómo cambia entre compradores y no compradores?</h1>
+    <p class="lead">Anexo de la Pregunta 5 del desafío Falabella. Usa la misma cadena de Markov de P4 (orden 1, con autotransiciones, julio 2026) y mide la fuga de tres formas, con intervalos del 95% por bootstrap por cliente.</p>
+    <div id="kpis" class="kpis"></div>
+    <p class="conclusion"><b>Por ende,</b> la fuga se concentra en Producto en ambos grupos, y el no comprador se va más desde casi todos los estados del embudo. La brecha más grande está en Producto y se explica sobre todo por visitas que llegan directo a una ficha y se van. Los que iban camino a comprar se pierden más al volver del carro a Producto y en el Carrito que en el Checkout.</p>
+    <ul class="notas">
+      <li>C = compradores (5.000 clientes, 82.236 visitas). NC = no compradores (5.000 clientes, 18.915 visitas).</li>
+      <li>Abandono = la visita termina sin comprar. No significa que el cliente se perdió: puede volver en otra visita.</li>
+      <li>Entre corchetes, el intervalo del 95% (500 réplicas, sorteando clientes completos; igual que M.5).</li>
+    </ul>
+  </section>
+
+  <section id="medidas">
+    <h2>Cómo medimos la fuga</h2>
+    <p class="nota-corta">Las tres medidas salen de la misma cadena, pero responden preguntas distintas. Ejemplo: Producto, compradores.</p>
+    <div class="scroll"><table class="tabla texto">
+      <thead><tr><th>Medida</th><th>Pregunta que responde</th><th>Cálculo</th><th>Ejemplo</th><th>Para qué la usamos</th><th>Cuidado</th></tr></thead>
+      <tbody>
+        <tr><td><b>Fuga por salida de estado</b> (principal en P5)</td><td>Cuando el cliente deja este estado, ¿qué probabilidad hay de que termine la visita?</td><td>Abandonos desde X ÷ clics de X que van a otro estado (sin contar quedarse en X)</td><td>25,0%</td><td>Comparar el riesgo entre estados y entre compradores y no compradores.</td><td>No dice cuántas personas se pierden: un estado con pocas salidas puede tener fuga alta y pesar poco.</td></tr>
+        <tr><td><b>Fuga por hit</b></td><td>Estando en este estado, ¿qué probabilidad hay de que el siguiente clic sea el fin de la visita?</td><td>Abandonos desde X ÷ todos los clics de X</td><td>12,7%</td><td>Conectar con la matriz principal de P4 (lectura por clic).</td><td>Se diluye donde el cliente se repite mucho (Producto, Cuenta, Checkout, Otros). Mezcla “se va” con “se queda”.</td></tr>
+        <tr><td><b>% del total de abandonos</b></td><td>De todas las visitas que terminan sin compra, ¿cuántas se van desde este estado?</td><td>Abandonos desde X ÷ todos los abandonos del grupo</td><td>50,7%</td><td>Decir dónde se concentra el volumen de la fuga.</td><td>Depende del tráfico: un estado muy visitado concentra abandonos aunque su riesgo sea moderado.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="porque"><b>Cómo se conectan:</b> fuga por hit = (1 − % que se queda) × fuga por salida. En Producto (C): (1 − 0,492) × 25,0% = 12,7%. Por eso, si dos grupos se quedan distinto en un estado, la fuga por hit mezcla dos efectos; la fuga por salida aísla el “irse”.</p>
+    <details class="caja"><summary>Por qué no usamos otras medidas</summary><div>
+      <ul class="notas">
+        <li><b>Probabilidad de terminar abandonando (1 − matriz B):</b> en no compradores vale 100% en todos los estados por definición, así que no sirve para comparar grupos. En compradores es el espejo de la probabilidad de compra, que se usa en P6 (y el orden 1 la subestima, M.1).</li>
+        <li><b>Número de abandonos:</b> los compradores tienen 4,3 veces más visitas; comparar cantidades mediría tamaño del grupo, no comportamiento. Se compara en %.</li>
+        <li><b>Abandono por cliente:</b> el abandono es por visita; el cliente sigue en la muestra. El paso a nivel de cliente se mira aparte (recompra después de un carro sin compra).</li>
+      </ul></div></details>
+  </section>
+
+  <section id="estados">
+    <h2>Fuga por estado (matriz principal)</h2>
+    <div class="controles"><div class="tabs" data-target="estados-grupo">
+      <button class="on" data-v="C">Compradores</button><button data-v="NC">No compradores</button></div></div>
+    <div class="scroll"><table class="tabla" id="tabla-estados"></table></div>
+    <p class="fuente">Clics = hits del estado que tienen un paso siguiente. Salidas = clics que van a otro estado. Fuente: p5_medidas (versión base).</p>
+    <figure class="fig"><div class="fig-svg" id="fig1"></div>
+      <figcaption>Figura 1. A: % del total de abandonos. B: fuga por salida de estado con su intervalo del 95%. No compradores con pocos datos: Checkout (407 salidas), Cuenta y servicios (607), Otros (705).</figcaption></figure>
+  </section>
+
+  <section id="brecha">
+    <h2>Compradores vs no compradores: la brecha</h2>
+    <p class="nota-corta">Brecha = no compradores − compradores, en puntos porcentuales (pp). Si el intervalo no toca el 0, la diferencia no es ruido de muestreo.</p>
+    <div class="scroll"><table class="tabla" id="tabla-brecha"></table></div>
+    <h3>¿Cuánto de la brecha en fuga por hit es “se va más” y cuánto es “se queda menos”?</h3>
+    <p class="nota-corta">Como fuga por hit = (1 − se queda) × fuga por salida, la brecha se puede repartir exactamente en dos partes (reparto simétrico, usando el promedio de ambos grupos como peso).</p>
+    <div class="scroll"><table class="tabla" id="tabla-descomp"></table></div>
+    <p class="fuente">Lectura: en Producto, de los 14,7 pp de brecha por hit, 12,1 pp vienen de que el no comprador se va más al salir y 2,6 pp de que se queda menos en Producto. La dilución afecta el nivel, pero no explica la brecha.</p>
+    <h3>Checkout sin la opción Compra</h3>
+    <p class="nota-corta">El no comprador no puede comprar. Para comparar en igualdad, a los compradores se les quita la salida a Compra y se recalcula la fuga entre las salidas restantes.</p>
+    <div class="scroll"><table class="tabla" id="tabla-sincompra"></table></div>
+  </section>
+
+  <section id="sensibilidades">
+    <h2>Sensibilidades: ¿la brecha se mantiene?</h2>
+    <p class="nota-corta">Recalculamos todo con distintos subconjuntos de visitas y con el ajuste por actividad. En cada réplica del bootstrap se sortean los mismos clientes para todas las versiones.</p>
+    <div class="scroll"><table class="tabla texto" id="tabla-versiones"></table></div>
+    <div class="controles" style="margin-top:1rem">
+      <div class="tabs" data-target="sens-medida">
+        <button class="on" data-v="dif">Brecha (pp)</button><button data-v="C">Compradores</button><button data-v="NC">No compradores</button></div>
+      <div class="tabs" data-target="sens-tipo">
+        <button class="on" data-v="fuga_salida">Fuga por salida</button><button data-v="pct_abandonos">% del total de abandonos</button><button data-v="fuga_hit">Fuga por hit</button></div>
+    </div>
+    <div class="scroll"><table class="tabla" id="tabla-sens"></table></div>
+    <p class="fuente" id="nota-sens"></p>
+    <figure class="fig"><div class="fig-svg" id="fig2"></div>
+      <figcaption>Figura 2. Brecha en fuga por salida (NC − C) en siete versiones. Punto blanco = matriz principal. La única brecha que cambia de signo es Cuenta y servicios.</figcaption></figure>
+    <h3>Robustez de la brecha (fuga por salida) en las 18 versiones</h3>
+    <div class="scroll"><table class="tabla" id="tabla-robustez"></table></div>
+    <h3>Semanas: orden de la fuga por salida entre los estados del embudo</h3>
+    <div class="scroll"><table class="tabla" id="tabla-semanas"></table></div>
+    <p class="fuente">S1 = 1–7 jul, S2 = 8–14, S3 = 15–21, S4 = 22–28, S5 = 29–31 (incluye la actividad inusual de fin de mes). Entre paréntesis, el puesto del estado (1 = mayor fuga).</p>
+  </section>
+
+  <section id="producto">
+    <h2>¿Quién se va desde Producto?</h2>
+    <p class="nota-corta">Cada abandono desde Producto se clasifica según la visita en la que ocurrió (las categorías son excluyentes y se asignan en este orden).</p>
+    <div class="scroll"><table class="tabla texto" id="tabla-quien"></table></div>
+    <p class="fuente">En P4 (Tabla 5) ya se vio que la fuga al salir de Producto depende de dónde llegó el cliente: 64% (C) y 84% (NC) cuando entró directo a la ficha. Fuente: producto_quien.</p>
+  </section>
+
+  <section id="carro">
+    <h2>Los que iban camino a comprar</h2>
+    <p class="nota-corta">“Camino a comprar” = visitas que pasaron por Agregar al carro o por Carrito. Es la señal de intención más clara que trae la base.</p>
+    <div class="scroll"><table class="tabla" id="tabla-embudo"></table></div>
+    <h3>Visitas con carro que terminaron sin compra: ¿desde dónde se fueron?</h3>
+    <div class="scroll"><table class="tabla" id="tabla-salida"></table></div>
+    <figure class="fig"><div class="fig-svg" id="fig3"></div>
+      <figcaption>Figura 3. Izquierda: visitas que pasaron por el carro y no compraron (18.271 C y 2.143 NC). Derecha: todas las visitas sin compra, como referencia.</figcaption></figure>
+    <p class="conclusion" id="recompra"></p>
+  </section>
+
+  <section id="checkout">
+    <h2>Checkout por pasos</h2>
+    <p class="nota-corta">Los clics del estado Checkout se separan en 4 pasos según node_type: 1) Login (soft login, solo app), 2) Resumen y despacho (one page checkout), 3) Dirección y agenda de despacho (shipping, direcciones, preagendamiento), 4) Pago. Lectura por clic: % de los clics del paso cuyo siguiente paso es cada destino.</p>
+    <div class="controles"><div class="tabs" data-target="ck-grupo">
+      <button class="on" data-v="C">Compradores</button><button data-v="NC">No compradores</button></div></div>
+    <div class="scroll"><table class="tabla" id="tabla-checkout"></table></div>
+    <p class="fuente" id="nota-checkout"></p>
+  </section>
+
+  <section id="validaciones">
+    <h2>Qué dicen las validaciones (M.1–M.6) para P5</h2>
+    <div class="scroll"><table class="tabla texto">
+      <thead><tr><th>Validación</th><th>Qué encontramos</th><th>Qué significa para P5</th></tr></thead>
+      <tbody>
+        <tr><td><b>M.1</b> Orden 1</td><td>El orden 1 calcula bien las probabilidades de un paso; Producto es el estado donde más importa de dónde viene el cliente.</td><td>La fuga es una probabilidad de un paso: el orden 1 sirve. Pero el promedio de Producto mezcla situaciones muy distintas; por eso se separa por entrada y rebote.</td></tr>
+        <tr><td><b>M.2</b> Semanas</td><td>En compradores el orden de las fugas es igual todas las semanas. En no compradores cambia solo en S5.</td><td>La respuesta no depende de la semana. Checkout de no compradores en S5 y en días 30–31 tiene muy pocos datos.</td></tr>
+        <tr><td><b>M.3</b> Grupos y app/web</td><td>Compradores y no compradores navegan distinto; la web registra distinto (no registra Agregar al carro).</td><td>Separar los grupos es lo que pide P5. Solo app da la misma brecha.</td></tr>
+        <tr><td><b>M.4</b> Clientes muy activos</td><td>Con el ajuste por actividad las brechas crecen (Producto: +43 pp).</td><td>La conclusión no cambia de dirección; la matriz base es conservadora.</td></tr>
+        <tr><td><b>M.5</b> Precisión</td><td>Todas las brechas del embudo tienen intervalos que no tocan el 0.</td><td>Las diferencias no son ruido. Checkout, Cuenta y Otros de no compradores se leen con cautela.</td></tr>
+        <tr><td><b>M.6</b> Tipos de visita</td><td>59% de las visitas de compradores es posterior a su 1ª compra; la entrada cambia el recorrido.</td><td>Explica la única brecha negativa (Cuenta y servicios) y gran parte de la brecha en Producto (entrada directa a la ficha).</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="glosario">
+    <h2>Glosario</h2>
+    <div class="scroll"><table class="tabla texto">
+      <thead><tr><th>Término</th><th>Qué significa aquí</th></tr></thead>
+      <tbody>
+        <tr><td>Fuga / abandono</td><td>La visita termina sin compra. Es fin de visita, no pérdida del cliente.</td></tr>
+        <tr><td>Clic (hit)</td><td>Cada registro de navegación de la base. El paso de la cadena es el siguiente clic.</td></tr>
+        <tr><td>Salida de un estado</td><td>Un clic cuyo siguiente paso es otro estado (o el fin de la visita). Quedarse en el mismo estado no es salida.</td></tr>
+        <tr><td>Se queda (autotransición)</td><td>% de los clics del estado cuyo siguiente clic sigue en el mismo estado.</td></tr>
+        <tr><td>Brecha</td><td>No compradores − compradores, en puntos porcentuales (pp).</td></tr>
+        <tr><td>Rebote</td><td>Visita de un solo clic.</td></tr>
+        <tr><td>Compradores hasta su 1ª compra</td><td>Visitas de compradores que empiezan antes de (o en) la visita de su primera compra del mes.</td></tr>
+        <tr><td>Comparación más justa</td><td>Compradores hasta su 1ª compra y sin rebotes, frente a no compradores sin rebotes.</td></tr>
+        <tr><td>Ajuste por actividad</td><td>Matriz calculada dentro de 4 grupos de clientes según cuántas transiciones hacen y promediada según cuántos clientes tiene cada grupo (M.4).</td></tr>
+        <tr><td>Camino a comprar</td><td>Visita que pasó por Agregar al carro o Carrito.</td></tr>
+        <tr><td>IC 95%</td><td>Intervalo del 95% por bootstrap por cliente (500 réplicas). Mide el error de muestreo, no corrige limitaciones del modelo.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="descargas">
+    <h2>Descargas y reproducibilidad</h2>
+    <ul class="notas">
+      <li>Script de cálculo (R): <a href="./fase7_p5_fugas.R">fase7_p5_fugas.R</a> (lee df_falabella_estados.rds sin modificarlo y guarda las tablas en CSV en la carpeta resultados_p5). Versión en R de las figuras: <a href="./fase7_p5_figuras.R">fase7_p5_figuras.R</a>.</li>
+      <li>Todos los resultados que usa esta página: <a href="./p5_anexo.json">p5_anexo.json</a> (las figuras de esta página se dibujan con <a href="./charts.js">charts.js</a> a partir de ese archivo).</li>
+      <li>Anexo de P4 (matrices completas y mapas): <a href="https://tefarikisyorgo-sys.github.io/anexo-p4/">anexo-p4</a>.</li>
+    </ul>
+  </section>
+  <p class="pie">Anexo P5 · Desafío 2 Customer Journey Falabella · Datos: julio 2026, 729.929 hits, 10.000 clientes. Cálculo propio en R.</p>
+</main>
+<script src="./charts.js?v=2026111001"></script>
+<script src="./app.js?v=2026111001"></script>
+</body>
+</html>
