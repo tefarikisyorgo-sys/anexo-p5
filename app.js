@@ -19,7 +19,7 @@
     entrada_busq_list: ['Entra por Búsqueda/Listado', 'Solo visitas que empiezan en Búsqueda o Listado.'],
     semana_S1: ['Semana 1 (1–7)', ''], semana_S2: ['Semana 2 (8–14)', ''], semana_S3: ['Semana 3 (15–21)', ''],
     semana_S4: ['Semana 4 (22–28)', ''], semana_S5: ['Semana 5 (29–31)', 'Incluye los días 30–31.'],
-    ajuste_actividad: ['Ajuste por actividad (M.4)', 'Matriz dentro de 4 grupos de clientes según su actividad, promediada por número de clientes.']
+    ajuste_actividad: ['Ponderación por cliente (M.4)', 'Matriz dentro de 4 grupos de clientes según su actividad, promediada por número de clientes.']
   };
   const ORDEN_V = ['base', 'sin_rebotes', 'hasta_1a_compra', 'mas_justa', 'solo_app', 'dias_1_29', 'ajuste_actividad', 'posteriores',
     'entrada_portada', 'entrada_producto', 'entrada_busq_list', 'semana_S1', 'semana_S2', 'semana_S3', 'semana_S4', 'semana_S5', 'solo_web', 'dias_30_31'];
@@ -52,7 +52,7 @@
     const eC = J.embudo.find(x => x.grupo === 'C'), eN = J.embudo.find(x => x.grupo === 'NC');
     const k = [
       ['% del total de abandonos que ocurre desde Producto', n1(pC.pct_abandonos) + '%', n1(pN.pct_abandonos) + '%', 'Dónde se concentra la fuga'],
-      ['Fuga por salida de Producto', n1(pC.fuga_salida) + '%', n1(pN.fuga_salida) + '%', `Brecha ${sg(d.dif)} pp [${n1(d.lo)}–${n1(d.hi)}]`],
+      ['Fuga por salida de Producto', n1(pC.fuga_salida) + '%', n1(pN.fuga_salida) + '%', `Diferencia ${sg(d.dif)} pp [${n1(d.lo)}–${n1(d.hi)}]`],
       ['Visitas que pasan por el carro', n1(eC.pasa_carro) + '%', n1(eN.pasa_carro) + '%', `C: ${n1(eC.carro_sin_compra)}% de ellas termina sin compra`],
       ['De las visitas con carro sin compra, se van desde Producto', n1(J.embudo_salida.find(x => x.grupo === 'C' && x.ultimo === 'PRODUCTO').pct) + '%',
         n1(J.embudo_salida.find(x => x.grupo === 'NC' && x.ultimo === 'PRODUCTO').pct) + '%', 'Desde Checkout: menos del 7%']
@@ -73,7 +73,7 @@
   }
 
   function tablaBrecha() {
-    let h = `<thead><tr><th>Estado</th><th>Fuga por salida C / NC</th><th>Brecha por salida (pp)</th><th>Fuga por hit C / NC</th><th>Brecha por hit (pp)</th><th>% abandonos C / NC</th><th>Brecha % abandonos (pp)</th></tr></thead><tbody>`;
+    let h = `<thead><tr><th>Estado</th><th>Fuga por salida C / NC</th><th>Diferencia por salida (pp)</th><th>Fuga por hit C / NC</th><th>Diferencia por hit (pp)</th><th>% abandonos C / NC</th><th>Diferencia % abandonos (pp)</th></tr></thead><tbody>`;
     EST.forEach(e => {
       const c = med('base', 'C', e), nc = med('base', 'NC', e);
       const ds = dif('base', 'fuga_salida', e), dh = dif('base', 'fuga_hit', e), dp = dif('base', 'pct_abandonos', e);
@@ -82,13 +82,13 @@
         `<td>${n1(c.pct_abandonos)} / ${n1(nc.pct_abandonos)}</td><td>${sg(dp.dif)}${ic(dp.lo, dp.hi)}</td></tr>`;
     });
     $('#tabla-brecha').innerHTML = h + '</tbody>';
-    let d = `<thead><tr><th>Estado</th><th>Se queda C / NC (%)</th><th>Brecha por hit (pp)</th><th>= Se va más (pp)</th><th>+ Se queda menos (pp)</th><th>% de la brecha que es “se va más”</th></tr></thead><tbody>`;
+    let d = `<thead><tr><th>Estado</th><th>Se queda C / NC (%)</th><th>Diferencia por hit (pp)</th><th>= Se va más (pp)</th><th>+ Se queda menos (pp)</th><th>% de la diferencia que es “se va más”</th></tr></thead><tbody>`;
     EST.forEach(e => {
       const x = J.descomposicion.find(z => z.estado === e), c = med('base', 'C', e), nc = med('base', 'NC', e);
       d += `<tr${e === 'PRODUCTO' ? ' class="dest"' : ''}><td>${NOM[e]}</td><td>${n1(c.queda)} / ${n1(nc.queda)}</td><td>${sg(x.brecha_hit)}</td><td>${sg(x.se_va_mas)}</td><td>${sg(x.se_queda_menos)}</td><td>${n0(Math.min(100, Math.max(0, x.pct_se_va_mas)))}%</td></tr>`;
     });
     $('#tabla-descomp').innerHTML = d + '</tbody>';
-    let s = `<thead><tr><th>Estado</th><th>Compradores: fuga por salida</th><th>Compradores: sin la opción Compra</th><th>No compradores</th><th>Brecha sin la opción Compra (pp)</th></tr></thead><tbody>`;
+    let s = `<thead><tr><th>Estado</th><th>Compradores: fuga por salida</th><th>Compradores: sin la opción Compra</th><th>No compradores</th><th>Diferencia sin la opción Compra (pp)</th></tr></thead><tbody>`;
     ['CARRITO', 'CHECKOUT'].forEach(e => {
       const c = med('base', 'C', e), nc = med('base', 'NC', e), dd = dif('base', 'fuga_salida_sin_compra', e);
       s += `<tr><td>${NOM[e]}</td><td>${n1(c.fuga_salida)}${ic(c.fuga_salida_lo, c.fuga_salida_hi)}</td><td>${n1(c.fuga_salida_sin_compra)}${ic(c.fuga_salida_sin_compra_lo, c.fuga_salida_sin_compra_hi)}</td><td>${n1(nc.fuga_salida)}${ic(nc.fuga_salida_lo, nc.fuga_salida_hi)}</td><td>${sg(dd.dif)}${ic(dd.lo, dd.hi)}</td></tr>`;
@@ -122,12 +122,12 @@
       h += '</tr>';
     });
     $('#tabla-sens').innerHTML = h + '</tbody>';
-    $('#nota-sens').textContent = (q === 'dif' ? 'Brecha = no compradores − compradores (pp). ' : G(q) + ' (%). ') +
+    $('#nota-sens').textContent = (q === 'dif' ? 'Diferencia = no compradores − compradores (pp). ' : G(q) + ' (%). ') +
       'En “Compradores hasta / después de su 1ª compra”, los no compradores usan todas sus visitas. Solo web, días 30–31 y algunas entradas tienen pocos datos en no compradores (intervalos anchos).';
   }
 
   function tablaRobustez() {
-    let h = `<thead><tr><th>Estado</th><th>Versiones</th><th>Brecha positiva con IC sobre 0</th><th>Brecha negativa con IC bajo 0</th><th>Rango de la brecha (7 versiones principales, pp)</th></tr></thead><tbody>`;
+    let h = `<thead><tr><th>Estado</th><th>Versiones</th><th>Diferencia positiva con IC sobre 0</th><th>Diferencia negativa con IC bajo 0</th><th>Rango de la diferencia (7 versiones principales, pp)</th></tr></thead><tbody>`;
     const R7 = ['base', 'sin_rebotes', 'hasta_1a_compra', 'mas_justa', 'solo_app', 'dias_1_29', 'ajuste_actividad'];
     EST.forEach(e => {
       const r = J.robustez.find(z => z.estado === e), ds = R7.map(v => dif(v, 'fuga_salida', e).dif);
@@ -154,7 +154,8 @@
     let h = `<thead><tr><th>Tipo de abandono desde Producto</th><th>Compradores (% de sus abandonos desde Producto)</th><th>No compradores</th></tr></thead><tbody>`;
     T.forEach(t => {
       const c = J.producto_quien.find(x => x.grupo === 'C' && x.tipo === t), nc = J.producto_quien.find(x => x.grupo === 'NC' && x.tipo === t);
-      h += `<tr><td>${t.replace(/^\d\. /, '')}</td><td>${n1(c.pct)}${ic(c.lo, c.hi)} <span class="ic">(${n0(c.N)})</span></td><td>${n1(nc.pct)}${ic(nc.lo, nc.hi)} <span class="ic">(${n0(nc.N)})</span></td></tr>`;
+      const lab = t.replace(/^\d\. /, '').replace(/.*naveg[oó] un poco.*/i, 'Entró directo a una ficha y vio más páginas').replace(/.*otra etapa.*/i, 'La visita empezó en otra página (Portada, Búsqueda, Listado…)');
+      h += `<tr><td>${lab}</td><td>${n1(c.pct)}${ic(c.lo, c.hi)} <span class="ic">(${n0(c.N)})</span></td><td>${n1(nc.pct)}${ic(nc.lo, nc.hi)} <span class="ic">(${n0(nc.N)})</span></td></tr>`;
     });
     $('#tabla-quien').innerHTML = h + '</tbody>';
   }
@@ -173,11 +174,11 @@
     $('#tabla-embudo').innerHTML = h + '</tbody>';
     const U = ['PRODUCTO', 'CARRITO', 'CHECKOUT', 'BUSQUEDA', 'LISTADO', 'PORTADA', 'AGREGAR_CARRO', 'CUENTA_SERVICIOS', 'OTROS'];
     const ik = {PRODUCTO: 'sale_producto', CARRITO: 'sale_carrito', CHECKOUT: 'sale_checkout'};
-    let s = `<thead><tr><th>Se fue desde</th><th>Compradores: visitas con carro sin compra (%)</th><th>No compradores (%)</th><th>Referencia: todas las visitas sin compra C / NC (%)</th></tr></thead><tbody>`;
+    let s = `<thead><tr><th>Se fue desde</th><th>Compradores: visitas con carro sin compra (%)</th><th>No compradores (%)</th></tr></thead><tbody>`;
     U.forEach(u => {
       const c = J.embudo_salida.find(x => x.grupo === 'C' && x.ultimo === u), nc = J.embudo_salida.find(x => x.grupo === 'NC' && x.ultimo === u);
       const ic1 = g => { if (!ik[u]) return ''; const z = i(g, ik[u]); return ic(z.lo, z.hi); };
-      s += `<tr${u === 'PRODUCTO' ? ' class="dest"' : ''}><td>${NOM[u]}</td><td>${c ? n1(c.pct) : '0,0'}${ic1('C')}</td><td>${nc ? n1(nc.pct) : '0,0'}${ic1('NC')}</td><td>${n1(med('base', 'C', u).pct_abandonos)} / ${n1(med('base', 'NC', u).pct_abandonos)}</td></tr>`;
+      s += `<tr${u === 'PRODUCTO' ? ' class="dest"' : ''}><td>${NOM[u]}</td><td>${c ? n1(c.pct) : '0,0'}${ic1('C')}</td><td>${nc ? n1(nc.pct) : '0,0'}${ic1('NC')}</td></tr>`;
     });
     $('#tabla-salida').innerHTML = s + '</tbody>';
     const r = J.recompra[0];
@@ -199,9 +200,9 @@
       (g === 'NC' ? '. Ojo: no compradores tienen solo 524 clics en Checkout; los intervalos son anchos.' : '.');
   }
 
-  function figuras() { if (!window.P5charts) return; ['fig1', 'fig2', 'fig3'].forEach(k => { const el = document.getElementById(k); if (el) el.innerHTML = window.P5charts[k](J); }); }
+  function figuras() { if (!window.P5charts) return; ['fig1'].forEach(k => { const el = document.getElementById(k); if (el) el.innerHTML = window.P5charts[k](J); }); }
 
-  fetch('./p5_anexo.json?v=2026111001').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(j => {
+  fetch('./p5_anexo.json?v=2026111101').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(j => {
     J = j; $('#estado-carga').remove();
     tabs(); kpis(); figuras(); tablaEstados(); tablaBrecha(); tablaVersiones(); tablaSens(); tablaRobustez(); tablaSemanas(); tablaQuien(); tablaEmbudo(); tablaCheckout();
   }).catch(e => { const a = $('#estado-carga'); a.classList.add('error'); a.textContent = 'No se pudieron cargar los datos (' + e.message + ').'; });
