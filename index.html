@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Anexo P5 · Fuga en el customer journey</title>
 <meta name="description" content="Anexo interactivo de la Pregunta 5: dónde se concentra la fuga y cómo cambia entre compradores y no compradores (Falabella, julio 2026).">
-<link rel="stylesheet" href="./style.css?v=2026111101">
+<link rel="stylesheet" href="./style.css?v=2026111102">
 </head>
 <body>
 <header class="top">
@@ -24,7 +24,6 @@
       <a href="#sensibilidades">Sensibilidades</a>
       <a href="#pdp">Ficha repetida</a>
       <a href="#connector">Connector</a>
-      <a href="#tipos">Tipos de visita (P4 y P5)</a>
       <a href="#validaciones">Validaciones</a>
       <a href="#glosario">Glosario</a>
       <a href="#descargas">Descargas</a>
@@ -40,7 +39,7 @@
     <p class="lead">Anexo de la Pregunta 5 del desafío Falabella. Usa la misma cadena de Markov de P4 (orden 1, con autotransiciones, julio 2026) y mide la fuga de tres formas, con intervalos del 95% por bootstrap por cliente.</p>
     <div id="kpis" class="kpis"></div>
     <p class="conclusion"><b>Por ende,</b> la fuga se concentra en Producto en ambos grupos y en todas las versiones. El no comprador tiene mayor probabilidad de fuga en casi todos los estados: en Producto y Listado, gran parte de la diferencia viene de las visitas de un clic; en Carrito y Checkout se mantiene aunque la visita tenga recorrido. En las visitas con recorrido, el gran quiebre está entre la ficha y el carro (probabilidad de perderse: 51% en compradores y 76% en no compradores). Los que llegan al carro y se van lo hacen sobre todo al volver a la ficha o desde el mismo carro, casi nunca en el pago.</p>
-    <p class="nota-corta">Versión 2 (11-nov): todo en probabilidades, menos versiones en el texto principal, secciones nuevas (cómo termina la visita, caminos típicos, ficha repetida, connector) y la lectura por tipos de visita al final.</p>
+    <p class="nota-corta">Versión 2 (11-nov): todo en probabilidades, menos versiones en el texto principal, secciones nuevas (cómo termina la visita, caminos típicos, ficha repetida, connector). La lectura por tipos de visita está en un anexo aparte: <a href="https://tefarikisyorgo-sys.github.io/anexo-p45-tipos/">anexo-p45-tipos</a>.</p>
     <ul class="notas">
       <li>C = compradores (5.000 clientes, 82.236 visitas). NC = no compradores (5.000 clientes, 18.915 visitas).</li>
       <li>Abandono = la visita termina sin comprar. No significa que el cliente se perdió: puede volver en otra visita.</li>
@@ -196,43 +195,6 @@
     <div class="scroll"><table class="tabla" id="tabla-con-num1"></table></div>
   </section>
 
-  <section id="tipos">
-    <h2>Tipos de visita: P4 y P5 con diferenciación de visitas</h2>
-    <p class="nota-corta">Complemento de P4 y P5 (pestaña “Respuesta P4 y P5 con diferenciación de visitas”). Cada visita recibe un nombre según cómo navega, no según si compró. La base no cambia: la suma de las transiciones de los cinco tipos reproduce exactamente la matriz de P4. Inspirado en Moe (2003), sin clustering: describe comportamiento, no intención comprobada.</p>
-    <div class="scroll"><table class="tabla texto">
-      <thead><tr><th>Orden</th><th>Tipo</th><th>Regla</th><th>Por qué esta señal</th><th>Equivalente en Moe (2003)</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Superficial (rebote)</td><td>1 solo clic</td><td>Entra y se va</td><td>Visitas superficiales</td></tr>
-        <tr><td>2</td><td>Compra dirigida</td><td>Llega al carro (Agregar al carro o Carrito) o al Checkout, compre o no</td><td>Señal más clara de que eligió un producto</td><td>Compra dirigida</td></tr>
-        <tr><td>3</td><td>Gestión de cuenta</td><td>Entra a Cuenta y servicios sin ver fichas</td><td>Viene a revisar un pedido o su cuenta</td><td>No está en Moe (propia de un retailer con cuenta)</td></tr>
-        <tr><td>4</td><td>Busca y compara</td><td>Usa el buscador (y no llega al carro)</td><td>Escribir una búsqueda indica que viene a algo específico</td><td>Búsqueda y deliberación</td></tr>
-        <tr><td>5</td><td>Explora (vitrinea)</td><td>El resto: navega sin buscar y sin llegar al carro</td><td>Mira sin un objetivo concreto</td><td>Exploración (hedonic browsing)</td></tr>
-      </tbody></table></div>
-    <h3>Probabilidad de que una visita sea de cada tipo</h3>
-    <div class="scroll"><table class="tabla" id="tabla-t-reparto"></table></div>
-    <h3>P4 por tipo: camino más probable</h3>
-    <figure class="fig"><img src="./p45_fig_caminos.svg" alt="Camino más probable de cada tipo de visita" style="width:100%;height:auto"><figcaption>Camino más probable de cada tipo (compradores | no compradores).</figcaption></figure>
-    <div class="scroll"><table class="tabla" id="tabla-t-clave"></table></div>
-    <h3>P4 por tipo: matriz completa (por clic, con autotransiciones)</h3>
-    <div class="controles"><select id="t-sel" aria-label="Tipo y grupo"></select></div>
-    <div class="scroll"><table class="tabla" id="tabla-t-matriz"></table></div>
-    <h3>P5 por tipo: fuga por salida de cada estado</h3>
-    <p class="nota-corta">Entre paréntesis, las salidas del estado. Se muestran solo celdas con 30 salidas o más.</p>
-    <div class="scroll"><table class="tabla" id="tabla-t-fuga"></table></div>
-    <div class="scroll"><table class="tabla texto" id="tabla-t-salida"></table></div>
-    <h3>¿La diferencia entre grupos viene del tipo de visita?</h3>
-    <figure class="fig"><img src="./p45_fig_mezcla.svg" alt="Fuga con la mezcla de visitas de los compradores" style="width:100%;height:auto"><figcaption>Fuga por salida del no comprador si tuviera la mezcla de tipos de visita del comprador.</figcaption></figure>
-    <div class="scroll"><table class="tabla" id="tabla-t-mezcla"></table></div>
-    <h3>Sensibilidades</h3>
-    <p class="nota-corta">Compradores antes y después de su 1ª compra:</p>
-    <div class="scroll"><table class="tabla" id="tabla-t-momento"></table></div>
-    <div class="scroll"><table class="tabla" id="tabla-t-momento-fs"></table></div>
-    <p class="nota-corta">Reglas alternativas (una a la vez):</p>
-    <div class="scroll"><table class="tabla texto" id="tabla-t-reglas"></table></div>
-    <p class="nota-corta">Semanas:</p>
-    <div class="scroll"><table class="tabla" id="tabla-t-semanas"></table></div>
-    <p class="fuente">Script: fase7_p45_tipos_visita.R (en la carpeta Script R tesis) · datos: <a href="./p45_tipos_anexo.json">p45_tipos_anexo.json</a>.</p>
-  </section>
 
   <section id="validaciones">
     <h2>Qué dicen las validaciones (M.1–M.6) para P5</h2>
@@ -277,14 +239,14 @@
       <li>Complementos de la versión 2 (R): fase7_p5_complementos.R (en la carpeta Script R tesis) (tablas nuevas en <a href="./p5c_anexo.json">p5c_anexo.json</a>).</li>
       <li>Script de cálculo (R): <a href="./fase7_p5_fugas.R">fase7_p5_fugas.R</a> (lee df_falabella_estados.rds sin modificarlo y guarda las tablas en CSV en la carpeta resultados_p5). Versión en R de las figuras: <a href="./fase7_p5_figuras.R">fase7_p5_figuras.R</a>.</li>
       <li>Todos los resultados que usa esta página: <a href="./p5_anexo.json">p5_anexo.json</a> (las figuras de esta página se dibujan con <a href="./charts.js">charts.js</a> a partir de ese archivo).</li>
+      <li>Anexo de P4 y P5 por tipos de visita: <a href="https://tefarikisyorgo-sys.github.io/anexo-p45-tipos/">anexo-p45-tipos</a>.</li>
       <li>Anexo de P4 (matrices completas y mapas): <a href="https://tefarikisyorgo-sys.github.io/anexo-p4/">anexo-p4</a>.</li>
     </ul>
   </section>
   <p class="pie">Anexo P5 · Desafío 2 Customer Journey Falabella · Datos: julio 2026, 729.929 hits, 10.000 clientes. Cálculo propio en R.</p>
 </main>
-<script src="./charts.js?v=2026111101"></script>
-<script src="./app.js?v=2026111101"></script>
-<script src="./app2.js?v=2026111101"></script>
-<script src="./app3.js?v=2026111101"></script>
+<script src="./charts.js?v=2026111102"></script>
+<script src="./app.js?v=2026111102"></script>
+<script src="./app2.js?v=2026111102"></script>
 </body>
 </html>
